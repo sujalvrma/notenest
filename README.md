@@ -1,7 +1,7 @@
 # NoteNest — Setup & Run Guide
 
 ## What is NoteNest?
-A platform where contributors register, upload handwritten notes, and AI (Claude) verifies
+A platform where contributors register, upload handwritten notes, and AI (Gemini) verifies
 accuracy before publishing. Notes scoring 70%+ go live automatically.
 
 ---
@@ -61,19 +61,22 @@ pip install -r requirements.txt
 
 ---
 
-## Step 4 — Set your Anthropic API key
+## Step 4 — Set your Gemini API key
 
-NoteNest uses Claude (claude-sonnet-4-6) to verify notes.
-Get your API key from: https://console.anthropic.com
+NoteNest uses Google Gemini AI to verify notes.
+Get your API key from: https://makersuite.google.com/app/apikey
 
 Set it as an environment variable:
 
 ```bash
 # On Windows (Command Prompt):
-set ANTHROPIC_API_KEY=sk-ant-your-key-here
+set GEMINI_API_KEY=your-gemini-api-key-here
+
+# On Windows (PowerShell):
+$env:GEMINI_API_KEY="your-gemini-api-key-here"
 
 # On Mac/Linux:
-export ANTHROPIC_API_KEY=sk-ant-your-key-here
+export GEMINI_API_KEY=your-gemini-api-key-here
 ```
 
 ---
@@ -100,7 +103,7 @@ The SQLite database (notenest.db) and uploads/ folder are created automatically.
 1. **Register** — Create an account at /register
 2. **Upload** — Go to "Upload Notes", fill in title, subject, description,
    paste the note content, and optionally attach a handwritten image
-3. **AI Verifies** — Claude reads the content and scores it 0–100 for factual accuracy
+3. **AI Verifies** — Gemini reads the content and scores it 0–100 for factual accuracy
 4. **Published** — Score >= 70: note goes live. Score < 70: feedback shown, resubmit
 
 ---

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }} — NoteNest{% endblock %}
+
+{% block content %}
+<div class="note-detail-header">
+  <div class="note-topic-tag">{{ note.topic }}{% if note.specific_topic %} &nbsp;·&nbsp; {{ note.specific_topic }}{% endif %}</div>
+  <h1>{{ note.title }}</h1>
+  <p class="note-desc">{{ note.description }}</p>
+  <div class="note-meta-row">
+    <div class="author-info">
+      <div class="ava ava-lg">{{ note.author.first_name[0] }}</div>
+      <div>
+        <div class="author-name">{{ note.author.first_name }} {{ note.author.last_name }}</div>
+        <div class="post-date">{{ note.created_at.strftime('%d %B %Y') }}</div>
+      </div>
+    </div>
+    <div class="note-badges">
+      <span class="badge badge-verified">✓ {{ note.ai_score }}% verified</span>
+      <span class="views-count">{{ note.views }} views</span>
+    </div>
+  </div>
+</div>
+
+{% if note.image_file %}
+  <div class="note-image-section">
+    <div class="section-label">Handwritten notes</div>
+    <img src="{{ url_for('static', filename='uploads/' + note.image_file) }}" alt="Handwritten notes by {{ note.author.first_name }}" class="note-image"/>
+  </div>
+{% endif %}
+
+<div class="note-content-section">
+  <div class="section-label">Note content</div>
+  <div class="note-content-body">{{ note.content }}</div>
+</div>
+
+<div class="note-footer">
+  <a href="{{ url_for('index') }}" class="btn btn-ghost">← Back to notes</a>
+  {% if session.get('user_id') %}
+    <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload your own note</a>
+  {% endif %}
+</div>
+{% endblock %}

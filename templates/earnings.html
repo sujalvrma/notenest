@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Earnings & Withdrawal — NoteNest{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Earnings & Withdrawal</h1>
+  <p>Track your note views and request a payout to your bank account.</p>
+</div>
+
+<div class="earn-grid">
+
+  <div class="earn-stats">
+    <div class="stat-card"><div class="stat-label">Total views</div><div class="stat-value v-purple">48,230</div></div>
+    <div class="stat-card"><div class="stat-label">Total earned</div><div class="stat-value v-green">₹2,411</div></div>
+    <div class="stat-card"><div class="stat-label">Already paid</div><div class="stat-value">₹800</div></div>
+    <div class="stat-card"><div class="stat-label">Available now</div><div class="stat-value v-amber">₹1,611</div></div>
+  </div>
+
+  <div class="earn-rate-box">
+    <div class="earn-rate-title">Earning rate</div>
+    <div class="earn-rate-val">₹0.05 <span>per view</span></div>
+    <div class="earn-rate-sub">Minimum withdrawal: ₹500 · Processed within 3–5 working days</div>
+  </div>
+
+  <div class="earn-history-card">
+    <div class="tbl-head"><span>Per note earnings</span></div>
+    <div class="pr">
+      <div class="pr-title">Integration by Parts<span class="tr-topic">Mathematics</span></div>
+      <div class="pr-views">12,401 views</div>
+      <div class="pr-earn">₹620</div>
+      <div class="pr-st"><span class="badge badge-verified">✓ Live</span></div>
+    </div>
+    <div class="pr">
+      <div class="pr-title">ML Introduction Notes<span class="tr-topic">Open Topic</span></div>
+      <div class="pr-views">21,003 views</div>
+      <div class="pr-earn">₹1,050</div>
+      <div class="pr-st"><span class="badge badge-verified">✓ Live</span></div>
+    </div>
+    <div class="pr">
+      <div class="pr-title">Organic Chemistry Tricks<span class="tr-topic">Chemistry</span></div>
+      <div class="pr-views">9,140 views</div>
+      <div class="pr-earn">₹457</div>
+      <div class="pr-st"><span class="badge badge-verified">✓ Live</span></div>
+    </div>
+    <div class="pr">
+      <div class="pr-title">Probability Distributions<span class="tr-topic">Mathematics</span></div>
+      <div class="pr-views">5,686 views</div>
+      <div class="pr-earn">₹284</div>
+      <div class="pr-st"><span class="badge badge-verified">✓ Live</span></div>
+    </div>
+  </div>
+
+  <div class="withdraw-card">
+    <div class="tbl-head" style="border-bottom:0.5px solid var(--brd);padding-bottom:14px;margin-bottom:20px">
+      <span>Request withdrawal</span>
+      <span class="badge badge-verified">₹1,611 available</span>
+    </div>
+
+    <div id="withdraw-form">
+      <div class="form-group">
+        <label>Full name (as per bank)</label>
+        <input type="text" placeholder="Priya Sharma" id="w-name"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Bank account number</label>
+          <input type="text" placeholder="XXXX XXXX XXXX" id="w-acc"/>
+        </div>
+        <div class="form-group">
+          <label>IFSC code</label>
+          <input type="text" placeholder="SBIN0001234" id="w-ifsc"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>UPI ID (optional)</label>
+        <input type="text" placeholder="priya@upi" id="w-upi"/>
+      </div>
+      <div class="form-group">
+        <label>Amount to withdraw (₹)</label>
+        <input type="number" placeholder="500" min="500" max="1611" id="w-amount"/>
+        <span class="field-hint">Min ₹500 · Max ₹1,611</span>
+      </div>
+      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px" onclick="submitWithdraw()">
+        Request Payout
+      </button>
+      <div class="notice-box" style="margin-top:14px;margin-bottom:0">
+        <strong>Note:</strong> This is a demo page. No real transaction will be processed. Payment gateway will be integrated in the next version.
+      </div>
+    </div>
+
+    <div id="withdraw-success" style="display:none">
+      <div class="success-banner" style="margin-bottom:16px">
+        <div class="success-icon" style="font-size:16px;color:#4ade80">✓</div>
+        <div>
+          <div class="success-title">Withdrawal request submitted!</div>
+          <div class="success-sub">Your request for <strong id="req-amount"></strong> has been received. It will be processed within 3–5 working days.</div>
+        </div>
+      </div>
+      <div class="earn-history-card" style="margin-top:0">
+        <div class="tbl-head"><span>Request details</span></div>
+        <div class="pr"><div class="pr-title">Request ID</div><div class="pr-earn" id="req-id"></div></div>
+        <div class="pr"><div class="pr-title">Amount</div><div class="pr-earn" id="req-amt2"></div></div>
+        <div class="pr"><div class="pr-title">Status</div><div class="pr-st"><span class="badge badge-pending">⏳ Processing</span></div></div>
+        <div class="pr"><div class="pr-title">Expected by</div><div class="pr-earn" id="req-date"></div></div>
+      </div>
+      <a href="/dashboard" class="btn btn-ghost btn-full" style="margin-top:12px">Back to dashboard</a>
+    </div>
+  </div>
+
+  <div class="payout-history-card">
+    <div class="tbl-head"><span>Payout history</span></div>
+    <div class="pr">
+      <div class="pr-title">January 2025 payout<span class="tr-topic">Bank transfer</span></div>
+      <div class="pr-views">15 Jan 2025</div>
+      <div class="pr-earn">₹500</div>
+      <div class="pr-st"><span class="badge badge-verified">✓ Paid</span></div>
+    </div>
+    <div class="pr">
+      <div class="pr-title">February 2025 payout<span class="tr-topic">UPI</span></div>
+      <div class="pr-views">12 Feb 2025</div>
+      <div class="pr-earn">₹300</div>
+      <div class="pr-st"><span class="badge badge-verified">✓ Paid</span></div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.earn-grid{display:flex;flex-direction:column;gap:20px}
+.earn-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.earn-rate-box{background:rgba(124,109,250,0.07);border:0.5px solid rgba(124,109,250,0.2);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.earn-rate-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
+.earn-rate-val{font-size:28px;font-weight:700;color:#7c6dfa;font-family:'JetBrains Mono',monospace}
+.earn-rate-val span{font-size:14px;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif}
+.earn-rate-sub{font-size:12px;color:var(--muted);margin-left:auto}
+.earn-history-card,.withdraw-card,.payout-history-card{background:var(--s1);border:0.5px solid var(--brd);border-radius:14px;overflow:hidden}
+.withdraw-card{padding:20px}
+.pr-earn{flex:1;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:#4ade80}
+.pr-views{flex:1;text-align:right;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+</style>
+<script>
+function submitWithdraw(){
+  const name=document.getElementById('w-name').value.trim();
+  const acc=document.getElementById('w-acc').value.trim();
+  const amount=document.getElementById('w-amount').value.trim();
+  if(!name||!acc||!amount){alert('Please fill in your name, account number and amount.');return;}
+  if(parseInt(amount)<500){alert('Minimum withdrawal amount is ₹500.');return;}
+  const id='NN-'+Math.floor(Math.random()*900000+100000);
+  const d=new Date();d.setDate(d.getDate()+5);
+  const dateStr=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('req-amount').textContent='₹'+parseInt(amount).toLocaleString('en-IN');
+  document.getElementById('req-id').textContent=id;
+  document.getElementById('req-amt2').textContent='₹'+parseInt(amount).toLocaleString('en-IN');
+  document.getElementById('req-date').textContent=dateStr;
+  document.getElementById('withdraw-form').style.display='none';
+  document.getElementById('withdraw-success').style.display='block';
+}
+</script>
+{% endblock %}

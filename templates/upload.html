@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Upload Notes — NoteNest{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Upload your handwritten notes</h1>
+  <p>Just take a photo of your notes and upload it. AI will read, extract, and verify everything automatically.</p>
+</div>
+
+<div class="flow-steps">
+  <div class="flow-step"><div class="fs-num">1</div><div class="fs-label">Fill details</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="fs-num">2</div><div class="fs-label">Upload note photo</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="fs-num">3</div><div class="fs-label">AI reads & verifies</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step"><div class="fs-num">4</div><div class="fs-label">Auto published</div></div>
+</div>
+
+<div class="notice-box">
+  <strong>How it works:</strong> Upload a clear photo of your handwritten notes. The AI will automatically read the handwriting, extract all the text, verify factual accuracy, and publish it if the score is 70% or above — no typing needed!
+</div>
+
+<form class="upload-form" method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data" id="upload-form">
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="title">Note title <span class="required">*</span></label>
+      <input type="text" id="title" name="title" required placeholder="e.g. Newton's Laws of Motion"/>
+    </div>
+    <div class="form-group">
+      <label for="topic">Subject <span class="required">*</span></label>
+      <select id="topic" name="topic" required>
+        <option value="">Select subject...</option>
+        {% for s in ['Mathematics','Physics','Chemistry','Biology','History','Geography','Computer Science','Economics','Open Topic'] %}
+          <option value="{{ s }}">{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="specific_topic">Specific topic <span class="required">*</span></label>
+    <input type="text" id="specific_topic" name="specific_topic" required
+           placeholder="e.g. Trigonometry, Photosynthesis, World War II, Linked Lists..."/>
+    <span class="field-hint">Tell us exactly what concept or chapter these notes cover.</span>
+  </div>
+
+  <div class="form-group">
+    <label>Handwritten note image <span class="required">*</span></label>
+    <div class="upload-zone" id="upload-zone"
+         onclick="document.getElementById('image-input').click()"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="handleDrop(event)">
+      <div class="upload-icon-wrap" id="upload-icon">📷</div>
+      <p class="upload-main-text" id="upload-main-text">Take a photo of your notes and upload it here</p>
+      <p class="upload-sub-text">Drag & drop or click to browse — .jpg, .png, .jpeg — max 16 MB</p>
+      <input type="file" name="image" id="image-input" accept=".jpg,.jpeg,.png"
+             style="display:none" onchange="handleFileSelect(this)"/>
+    </div>
+    <div id="image-preview-wrap" style="display:none;margin-top:12px">
+      <img id="image-preview" src="" alt="Preview"
+           style="max-height:280px;border-radius:10px;border:0.5px solid rgba(255,255,255,0.07);object-fit:contain;background:#13151d;width:100%"/>
+    </div>
+  </div>
+
+  <div class="fallback-section">
+    <div class="fallback-toggle" onclick="toggleFallback()">
+      <span id="fallback-arrow">▶</span> No image? Paste text instead (optional fallback)
+    </div>
+    <div id="fallback-body" style="display:none;margin-top:10px">
+      <div class="form-group">
+        <textarea name="content" id="content" rows="5"
+                  placeholder="Paste your note content here as a fallback if you don't have an image..."></textarea>
+        <span class="field-hint">Only used if no image is uploaded above.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions" style="margin-top:20px">
+    <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+      Upload & Verify with AI
+    </button>
+    <button type="button" class="btn btn-ghost btn-lg" onclick="resetForm()">Clear</button>
+  </div>
+
+  <div id="verifying-msg" style="display:none" class="verifying-msg">
+    <div class="dots"><span></span><span></span><span></span></div>
+    AI is reading your handwriting and verifying accuracy... this may take 10–20 seconds.
+  </div>
+
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function handleFileSelect(input) {
+  if (input.files[0]) { showPreview(input.files[0]); }
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) {
+    document.getElementById('image-input').files = e.dataTransfer.files;
+    showPreview(f);
+  }
+}
+function showPreview(file) {
+  document.getElementById('upload-main-text').textContent = 'Attached: ' + file.name;
+  document.getElementById('upload-icon').textContent = '✅';
+  document.getElementById('upload-zone').classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('image-preview').src = e.target.result;
+    document.getElementById('image-preview-wrap').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+function resetForm() {
+  document.getElementById('upload-main-text').textContent = 'Take a photo of your notes and upload it here';
+  document.getElementById('upload-icon').textContent = '📷';
+  document.getElementById('upload-zone').classList.remove('has-file');
+  document.getElementById('image-preview-wrap').style.display = 'none';
+  document.getElementById('image-preview').src = '';
+  document.getElementById('image-input').value = '';
+  if (document.getElementById('content')) document.getElementById('content').value = '';
+  document.getElementById('specific_topic').value = '';
+}
+function toggleFallback() {
+  const body = document.getElementById('fallback-body');
+  const arrow = document.getElementById('fallback-arrow');
+  if (body.style.display === 'none') {
+    body.style.display = 'block'; arrow.textContent = '▼';
+  } else {
+    body.style.display = 'none'; arrow.textContent = '▶';
+  }
+}
+document.getElementById('upload-form').addEventListener('submit', function() {
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('submit-btn').textContent = 'Verifying...';
+  document.getElementById('verifying-msg').style.display = 'flex';
+});
+</script>
+{% endblock %}

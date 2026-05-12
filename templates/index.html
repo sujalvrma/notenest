@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}NoteNest — AI-Verified Handwritten Notes{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="hero-eyebrow">AI-Verified Handwritten Notes</div>
+  <h1>Learn from notes<br>written by <em>real people</em></h1>
+  <p>Browse handwritten notes across every subject — each one verified for accuracy by AI before publishing.</p>
+
+  <form class="search-form" method="GET" action="{{ url_for('index') }}">
+    <div class="search-row">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search notes, topics, contributors..."/>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </form>
+
+  <div class="filters">
+    <a href="{{ url_for('index') }}" class="filter-pill {% if topic == 'all' or not topic %}on{% endif %}">All</a>
+    {% for t in ['Mathematics','Science','History','Technology','Chemistry','Biology','Economics','Open Topic'] %}
+      <a href="{{ url_for('index', topic=t, q=q) }}" class="filter-pill {% if topic == t %}on{% endif %}">{{ t }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="section-label">
+  {% if q %}Results for "{{ q }}"{% else %}Recently verified notes{% endif %}
+</div>
+
+{% if notes %}
+  <div class="notes-grid">
+    {% for note in notes %}
+      <a href="{{ url_for('note_detail', note_id=note.id) }}" class="note-card tp-{{ note.topic | lower | replace(' ','_') }}">
+        <div class="card-top-bar"></div>
+        <div class="card-topic">{{ note.topic }}</div>
+        <div class="card-title">{{ note.title }}</div>
+        {% if note.specific_topic %}
+          <div class="card-specific-topic">{{ note.specific_topic }}</div>
+        {% endif %}
+        <div class="card-preview">{{ note.content[:120] if note.content else '' }}...</div>
+        {% if note.image_file %}
+          <div class="card-has-image">📎 Handwritten image attached</div>
+        {% endif %}
+        <div class="card-foot">
+          <div class="author-row">
+            <div class="ava">{{ note.author.first_name[0] }}</div>
+            {{ note.author.first_name }} {{ note.author.last_name[0] }}.
+          </div>
+          <div class="card-right">
+            <span class="views-count">{{ note.views }} views</span>
+            <span class="badge badge-verified">✓ {{ note.ai_score }}%</span>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <p>No notes found{% if q %} for "{{ q }}"{% endif %}.</p>
+    {% if session.get('user_id') %}
+      <a href="{{ url_for('upload') }}" class="btn btn-primary" style="margin-top:12px">Be the first to upload</a>
+    {% else %}
+      <a href="{{ url_for('register') }}" class="btn btn-primary" style="margin-top:12px">Register to contribute</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

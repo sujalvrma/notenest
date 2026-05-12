@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — NoteNest{% endblock %}
+
+{% block content %}
+<div class="dash-header">
+  <div>
+    <h1>Welcome back, {{ user.first_name }}</h1>
+    <p class="dash-sub">@{{ user.username }} · Contributor since {{ user.joined_at.strftime('%b %Y') }}</p>
+  </div>
+  <a href="{{ url_for('upload') }}" class="btn btn-primary">+ Upload new note</a>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Notes posted</div>
+    <div class="stat-value v-purple">{{ notes | length }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total views</div>
+    <div class="stat-value">{{ "{:,}".format(total_views) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Verified &amp; live</div>
+    <div class="stat-value v-green">{{ verified_count }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Avg. AI score</div>
+    <div class="stat-value v-amber">{{ avg_score }}%</div>
+  </div>
+</div>
+
+<div class="notes-table-card">
+  <div class="table-header">
+    <span>Your notes</span>
+    <span class="table-sub">{{ notes | length }} total</span>
+  </div>
+  {% if notes %}
+    {% for note in notes %}
+      <div class="table-row">
+        <div class="tr-title">
+          <a href="{{ url_for('note_detail', note_id=note.id) }}" class="note-link">{{ note.title }}</a>
+          <span class="tr-topic">{{ note.topic }}</span>
+        </div>
+        <div class="tr-views">{{ "{:,}".format(note.views) }} views</div>
+        <div class="tr-score">{{ note.ai_score }}% score</div>
+        <div class="tr-status">
+          {% if note.is_published %}
+            <span class="badge badge-verified">✓ Live</span>
+          {% else %}
+            <span class="badge badge-flagged">✗ Not published</span>
+          {% endif %}
+        </div>
+        <div class="tr-date">{{ note.created_at.strftime('%d %b %Y') }}</div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <p>You haven't uploaded any notes yet.</p>
+      <a href="{{ url_for('upload') }}" class="btn btn-primary" style="margin-top:12px">Upload your first note</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
